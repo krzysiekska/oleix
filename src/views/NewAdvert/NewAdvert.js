@@ -1,7 +1,10 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import * as yup from "yup";
 import {Formik} from "formik";
-import {Button, Col, Form, InputGroup, Row} from "react-bootstrap";
+import {Button, Col, Form, InputGroup, ListGroup, Row} from "react-bootstrap";
+import axios from "axios";
+import {useNavigate} from "react-router-dom";
+import {LinkContainer} from "react-router-bootstrap";
 
 const schema = yup.object().shape({
     title: yup.string().required(),
@@ -21,12 +24,28 @@ const initialValues={
         canNegotiate: false,
 };
 
+
 const NewAdvert = () => {
+    const navigate = useNavigate();
+    const [categories, setCategorie] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await axios.get('/categories');
+            setCategorie(response.data);
+        }
+        fetchData();
+    }, []);
+    const handleSubmitFormik= async (vaules)=>{
+        const request = {...vaules, createdOn: new Date().toISOString(), image:"http://placeimg.com/400/400/business?i=0"}
+        const response = await axios.post('/adverts', request);
+        navigate(`/advert/${response.data.id}`);
+
+    }
     return (
         <div>
             <Formik
                 validationSchema={schema}
-                onSubmit={console.log}
+                onSubmit={handleSubmitFormik}
                 initialValues={initialValues}
             >
                 {({
@@ -127,6 +146,16 @@ const NewAdvert = () => {
                                 feedbackType="invalid"
                                 id="validationFormik0"
                             />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Select aria-label="Default select example">
+                                <option></option>
+
+                                {categories.map(categorie => (
+
+                                    <option key={categorie.id} value={categorie.id}>{categorie.title}</option>
+                                ))}
+                            </Form.Select>
                         </Form.Group>
                         <Button type="submit">Submit form</Button>
                     </Form>
