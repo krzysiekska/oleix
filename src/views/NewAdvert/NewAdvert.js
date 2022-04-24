@@ -11,6 +11,7 @@ const schema = yup.object().shape({
     sellerPhone: yup.string().required(),
     canNegotiate: yup.bool(),
 });
+///ashkhdsakjhdsak
 const initialValues={
     title: 'Mark',
         price: 'Otto',
